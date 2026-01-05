@@ -1,16 +1,28 @@
-import { View, Text, Image, ScrollView } from "react-native";
+import { View, Text, Image, ScrollView, ActivityIndicator } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { properties } from "../../data/properties";
+import { useProperties } from "../../hooks/useProperties";
 
 export default function PropertyDetails() {
   const { id } = useLocalSearchParams();
+  const { properties, loading } = useProperties();
+
+  if (loading) {
+    return <ActivityIndicator style={{ marginTop: 40 }} />;
+  }
+
   const property = properties.find((p) => p.id === id);
 
-  if (!property) return null;
+  if (!property) {
+    return (
+      <View style={{ padding: 20 }}>
+        <Text>Property not found</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={{ padding: 20 }}>
-      {/* Image Slider (Horizontal) */}
+      {/* Images */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -30,7 +42,7 @@ export default function PropertyDetails() {
         ))}
       </ScrollView>
 
-      {/* Title */}
+      {/* Info */}
       <Text style={{ fontSize: 24, fontWeight: "700" }}>
         {property.title}
       </Text>
@@ -40,7 +52,7 @@ export default function PropertyDetails() {
       </Text>
 
       {/* Features */}
-      <Text style={{ marginTop: 14, fontSize: 18, fontWeight: "600" }}>
+      <Text style={{ marginTop: 16, fontSize: 18, fontWeight: "600" }}>
         Features
       </Text>
 
@@ -52,7 +64,7 @@ export default function PropertyDetails() {
       </View>
 
       {/* Description */}
-      <Text style={{ marginTop: 16, fontSize: 15, lineHeight: 22 }}>
+      <Text style={{ marginTop: 16, lineHeight: 22 }}>
         {property.description}
       </Text>
     </ScrollView>
