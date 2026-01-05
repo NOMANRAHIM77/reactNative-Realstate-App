@@ -4,22 +4,34 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
   Alert,
 } from "react-native";
-import { useAuth } from "../../context/AuthContext";
-import { useProfile } from "../../hooks/useProfile";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 
-export default function Profile() {
-  const { user, logout } = useAuth();
-  const router = useRouter();
+import { useAuth } from "../../context/AuthContext";
+import { useProfile } from "../../hooks/useProfile";
 
-  const { profile, saveProfile, loading } = useProfile(user.email);
+export default function Profile() {
+  const router = useRouter();
+  const { user, logout } = useAuth();
+
+  // ✅ ALWAYS call hooks
+  const email = user?.email ?? "";
+  const { profile, saveProfile, loading } = useProfile(email);
 
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
 
+  // 🔁 Redirect when logged out
+  useEffect(() => {
+    if (!user) {
+      router.replace("/");
+    }
+  }, [user]);
+
+  // 🔁 Load profile data
   useEffect(() => {
     if (profile) {
       setName(profile.name);
@@ -27,7 +39,12 @@ export default function Profile() {
     }
   }, [profile]);
 
-  if (loading) return null;
+  // ⛔ Render nothing while redirecting
+  if (!user) return null;
+
+  if (loading) {
+    return <ActivityIndicator style={{ marginTop: 40 }} />;
+  }
 
   const handleSave = async () => {
     await saveProfile({
@@ -36,6 +53,11 @@ export default function Profile() {
       address,
     });
     Alert.alert("Success", "Profile updated");
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    // redirect handled by effect
   };
 
   return (
@@ -57,42 +79,28 @@ export default function Profile() {
         <Text style={{ color: "#555" }}>{profile.email}</Text>
       </View>
 
-      {/* Editable Fields */}
+      {/* Inputs */}
       <Text>Name</Text>
       <TextInput
         value={name}
         onChangeText={setName}
-        placeholder="Enter your name"
         style={input}
+        placeholder="Your name"
       />
 
       <Text>Address</Text>
       <TextInput
         value={address}
         onChangeText={setAddress}
-        placeholder="Enter your address"
         style={input}
+        placeholder="Your address"
       />
 
-      {/* Save */}
       <TouchableOpacity style={btn} onPress={handleSave}>
         <Text style={{ color: "#fff" }}>Save Changes</Text>
       </TouchableOpacity>
 
-      {/* Extra Features */}
-      <View style={{ marginTop: 30 }}>
-        <Stat label="Listed Properties" value="2" />
-        <Stat label="Saved Homes" value="4" />
-      </View>
-
-      {/* Logout */}
-      <TouchableOpacity
-        style={{ marginTop: 30 }}
-        onPress={async () => {
-          await logout();
-          router.replace("/");
-        }}
-      >
+      <TouchableOpacity style={{ marginTop: 30 }} onPress={handleLogout}>
         <Text style={{ color: "red", textAlign: "center" }}>Logout</Text>
       </TouchableOpacity>
     </View>
@@ -114,18 +122,3 @@ const btn = {
   alignItems: "center",
   marginTop: 10,
 };
-
-const Stat = ({ label, value }: any) => (
-  <View
-    style={{
-      flexDirection: "row",
-      justifyContent: "space-between",
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderColor: "#eee",
-    }}
-  >
-    <Text>{label}</Text>
-    <Text style={{ fontWeight: "600" }}>{value}</Text>
-  </View>
-);
