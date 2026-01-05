@@ -1,17 +1,45 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
+import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 
 export default function Signup() {
   const router = useRouter();
+  const { signup } = useAuth();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignup = async () => {
+    try {
+      await signup(email, password);
+      Alert.alert("Success", "Account created successfully");
+      router.replace("/");
+    } catch (err: any) {
+      Alert.alert("Signup Failed", err.message);
+    }
+  };
 
   return (
     <View style={{ padding: 24 }}>
       <Text style={{ fontSize: 28, fontWeight: "600" }}>Create Account</Text>
 
-      <TextInput placeholder="Email" style={input} />
-      <TextInput placeholder="Password" secureTextEntry style={input} />
+      <TextInput
+        placeholder="Email"
+        style={input}
+        value={email}
+        onChangeText={setEmail}
+      />
 
-      <TouchableOpacity style={btn} onPress={() => router.replace("/")}>
+      <TextInput
+        placeholder="Password"
+        secureTextEntry
+        style={input}
+        value={password}
+        onChangeText={setPassword}
+      />
+
+      <TouchableOpacity style={btn} onPress={handleSignup}>
         <Text style={{ color: "#fff" }}>Signup</Text>
       </TouchableOpacity>
     </View>

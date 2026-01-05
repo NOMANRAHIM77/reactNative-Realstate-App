@@ -1,18 +1,18 @@
-export const properties = [
+export const DEFAULT_PROPERTIES = [
   {
     id: "1",
-    title: "Modern Villa",
+    title: "Modern Luxury Villa",
     price: "$250,000",
     location: "California",
-    image: "https://picsum.photos/400/300",
-    description: "Luxury modern villa with pool",
-  },
-  {
-    id: "2",
-    title: "City Apartment",
-    price: "$120,000",
-    location: "New York",
-    image: "https://picsum.photos/400/301",
-    description: "Apartment near downtown",
+    images: [
+      "https://picsum.photos/400/300",
+      "https://picsum.photos/400/301",
+    ],
+    features: {
+      pool: true,
+      garden: true,
+      parking: true,
+    },
+    description: "Luxury villa with pool and garden.",
   },
 ];

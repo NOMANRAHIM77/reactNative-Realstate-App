@@ -1,25 +1,44 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
 
 export default function Login() {
   const router = useRouter();
   const { login } = useAuth();
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      await login(email, password);
+      router.replace("/home");
+    } catch (err: any) {
+      Alert.alert("Login Failed", err.message);
+    }
+  };
+
   return (
     <View style={container}>
       <Text style={title}>Welcome Back</Text>
 
-      <TextInput placeholder="Email" style={input} />
-      <TextInput placeholder="Password" secureTextEntry style={input} />
+      <TextInput
+        placeholder="Email"
+        style={input}
+        value={email}
+        onChangeText={setEmail}
+      />
 
-      <TouchableOpacity
-        style={button}
-        onPress={() => {
-          login("test@mail.com", "123");
-          router.replace("/home");
-        }}
-      >
+      <TextInput
+        placeholder="Password"
+        secureTextEntry
+        style={input}
+        value={password}
+        onChangeText={setPassword}
+      />
+
+      <TouchableOpacity style={button} onPress={handleLogin}>
         <Text style={btnText}>Login</Text>
       </TouchableOpacity>
 
@@ -55,9 +74,7 @@ const button = {
   padding: 16,
   borderRadius: 12,
   alignItems: "center",
-  marginTop: 10,
 };
 
-const btnText = { color: "#fff", fontSize: 16 };
-
+const btnText = { color: "#fff" };
 const link = { marginTop: 20, textAlign: "center" };
