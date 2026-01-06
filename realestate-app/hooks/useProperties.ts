@@ -13,23 +13,32 @@ export const useProperties = () => {
   }, []);
 
   const loadProperties = async () => {
-    const stored = await AsyncStorage.getItem(PROPERTIES_KEY);
+    try {
+      const stored = await AsyncStorage.getItem(PROPERTIES_KEY);
 
-    if (stored) {
-      setProperties(JSON.parse(stored));
-    } else {
-      await AsyncStorage.setItem(
-        PROPERTIES_KEY,
-        JSON.stringify(DEFAULT_PROPERTIES)
-      );
-      setProperties(DEFAULT_PROPERTIES);
+      if (stored) {
+        setProperties(JSON.parse(stored));
+      } else {
+        await AsyncStorage.setItem(
+          PROPERTIES_KEY,
+          JSON.stringify(DEFAULT_PROPERTIES)
+        );
+        setProperties(DEFAULT_PROPERTIES);
+      }
+    } catch (error) {
+      console.log("Failed to load properties", error);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const addProperty = async (property: any) => {
-    const updated = [property, ...properties];
+    const newProperty = {
+      ...property,
+      id: Date.now().toString(), // 🔑 REQUIRED
+    };
+
+    const updated = [newProperty, ...properties];
     setProperties(updated);
     await AsyncStorage.setItem(PROPERTIES_KEY, JSON.stringify(updated));
   };

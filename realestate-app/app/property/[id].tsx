@@ -1,89 +1,67 @@
-import { View, Text, Image, ScrollView, ActivityIndicator } from "react-native";
+import { ScrollView, Text, Image, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useProperties } from "../../hooks/useProperties";
 
 export default function PropertyDetails() {
   const { id } = useLocalSearchParams();
-  const { properties, loading } = useProperties();
-
-  if (loading) {
-    return <ActivityIndicator style={{ marginTop: 40 }} />;
-  }
+  const { properties } = useProperties();
 
   const property = properties.find((p) => p.id === id);
 
   if (!property) {
-    return (
-      <View style={{ padding: 20 }}>
-        <Text>Property not found</Text>
-      </View>
-    );
+    return <Text style={{ padding: 20 }}>Property not found</Text>;
   }
 
   return (
-    <ScrollView style={{ padding: 20 }}>
-      {/* Images */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={{ marginBottom: 16 }}
-      >
-        {property.images.map((img, index) => (
+    <ScrollView>
+      <ScrollView horizontal pagingEnabled>
+        {property.images.map((img: string, index: number) => (
           <Image
             key={index}
             source={{ uri: img }}
-            style={{
-              width: 300,
-              height: 220,
-              borderRadius: 18,
-              marginRight: 12,
-            }}
+            style={{ width: 360, height: 250 }}
           />
         ))}
       </ScrollView>
 
-      {/* Info */}
-      <Text style={{ fontSize: 24, fontWeight: "700" }}>
-        {property.title}
-      </Text>
+      <View style={{ padding: 16 }}>
+        <Text style={{ fontSize: 22, fontWeight: "700" }}>
+          {property.title}
+        </Text>
+        <Text>{property.location}</Text>
+        <Text style={{ fontWeight: "bold" }}>{property.price}</Text>
 
-      <Text style={{ fontSize: 16, color: "#555" }}>
-        {property.price} • {property.location}
-      </Text>
+        <Text style={{ marginVertical: 10 }}>
+          {property.description}
+        </Text>
 
-      {/* Features */}
-      <Text style={{ marginTop: 16, fontSize: 18, fontWeight: "600" }}>
-        Features
-      </Text>
-
-      <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 8 }}>
-        {Object.entries(property.features).map(
-          ([key, value]) =>
-            value && <Feature key={key} text={key} />
-        )}
+        <Text>🏊 Pool: {property.features.pool ? "✔" : "✖"}</Text>
+        <Text>🌿 Garden: {property.features.garden ? "✔" : "✖"}</Text>
+        <Text>🚗 Garage: {property.features.garage ? "✔" : "✖"}</Text>
+        <Text>🌅 Balcony: {property.features.balcony ? "✔" : "✖"}</Text>
       </View>
 
-      {/* Description */}
-      <Text style={{ marginTop: 16, lineHeight: 22 }}>
-        {property.description}
+<View style={{ marginTop: 24 }}>
+  <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 10 }}>
+    Contact Agent
+  </Text>
+
+  <View style={{ flexDirection: "row", alignItems: "center" }}>
+    <Image
+      source={{ uri: property.contact.avatar }}
+      style={{ width: 50, height: 50, borderRadius: 25, marginRight: 12 }}
+    />
+    <View>
+      <Text style={{ fontWeight: "600" }}>
+        {property.contact.name}
       </Text>
+      <Text>{property.contact.email}</Text>
+      <Text>{property.contact.phone}</Text>
+    </View>
+  </View>
+</View>
+
+
     </ScrollView>
   );
 }
-
-const Feature = ({ text }: { text: string }) => (
-  <View
-    style={{
-      backgroundColor: "#000",
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 10,
-      marginRight: 8,
-      marginBottom: 8,
-    }}
-  >
-    <Text style={{ color: "#fff", fontSize: 13 }}>
-      ✔ {text.charAt(0).toUpperCase() + text.slice(1)}
-    </Text>
-  </View>
-);
