@@ -46,5 +46,4 @@ Users can sign up, log in, view properties, add their own properties, and manage
 ![Home Screen](images/homew.PNG)
 ![Add property](images/addpropertyw.PNG)
 ![Profile](images/profilew.PNG)
-![Add Property](assets/screenshots/add-property.png)
-![Profile Screen](assets/screenshots/profile.png)
+
